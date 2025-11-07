@@ -1,7 +1,7 @@
 # 🧠 Filog — Backend Showcase
 
-**Type:** Backend Engineering Project
-**Tech Stack:**
+
+## Tech Stack
 ![auto](https://skillicons.dev/icons?i=react,redux,tailwind,mongodb,docker,express,nodejs,typescript)
 
 ---
