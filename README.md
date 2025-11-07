@@ -1,99 +1,194 @@
-<picture>
-  <source srcset="Frontend/public/logo/logoMuted.png" media="(prefers-color-scheme: dark)">
-  <img src="Frontend/public/logo/logoColor.png" alt="Logo" height="100">
-</picture>
-<br></br>
+# 🧠 Filog — Backend Showcase
 
-**Filog** is a dynamic blogging platform, thoughtfully designed to provide a streamlined, secure, and immersive experience for bloggers and readers. Developed with **ReactJS** on the frontend and a custom **Node.js + TypeScript** backend, Filog enables users to create, share, and interact with blog content through an intuitive and visually pleasing interface. Filog emphasizes robust security, user-controlled access, and a scalable structure suitable for both single users and extensive communities.
+**Type:** Backend Engineering Project
+**Tech Stack:** Node.js 7 TypeScript 7 Express 7 MongoDB 7 Mongoose 7 JWT Auth 7 Google OAuth 7 Docker
 
+---
 
-## Table of Contents
+## 📘 Overview
 
-* [Features](#features)
-* [Getting Started](#getting-started)
-* [Project Structure](#project-structure)
-* [Challenges and Solutions](#challenges-and-solutions)
+Filog is a production-ready backend for a modern blogging platform.
+This repository contains a complete custom backend powering authentication, posts, comments, likes, follows, avatar generation, and dynamic Open Graph (OG) image generation. The frontend (React) is present as a demo; this repository is presented as a **backend engineering case study**.
 
-## Features
+---
 
-* **User Authentication and Profile Management:** Secure account creation, login, logout, and profile customization. Filog uses secure authentication with Google OAuth and custom methods, ensuring each user can authenticate safely.
+## 🚀 Core Features
 
-* **Blog Creation and Management:** Users can create, edit, and delete blog posts with options to add text, images, and other media.
+### Authentication & Security
 
-* **Interactions and Engagement:** Users can like and comment on posts, follow other profiles, and view posts from followed users. Every interaction is securely stored and processed in the backend.
+* JWT-based authentication with best-practice token handling.
+* Google OAuth 2.0 integration for social login.
+* Password hashing and input validation middleware.
 
-* **Customizable Modals for UX Enhancements:** Reusable modals enable notifications, forms, and alerts, adding to a streamlined user experience.
+### Social Blogging Functionality
 
-* **GSAP Animations:** The interface includes smooth animations for an engaging visual experience, crafted to work well across various devices without relying on heavy 3D libraries like Three.js.
+* Create / Edit / Delete posts with ownership-enforced authorization.
+* Commenting system and like/unlike semantics.
+* Follow / unfollow user relationships.
+* Atomic MongoDB updates (`$addToSet`, `$pull`) and conflict-safe patterns to prevent race conditions.
 
-* **Avatar Management:** Using the updated DiceBear API, each user receives a unique avatar, enhancing visual identity on the platform.
+### OG & Avatar
 
-* **Open Graph Protocol (OGP) Integration:** We have integrated Open Graph functionality to improve how Filog blog posts are shared on social media platforms. By utilizing **Vercel Functions** with Server-Side Rendering (SSR), we generate dynamic Open Graph meta tags for each blog post. This ensures that shared links will display rich previews such as post titles, descriptions, and images, enhancing the user experience when posts are shared on platforms like Facebook, Twitter, and LinkedIn.
+* Server-side dynamic Open Graph image generation (Vercel functions / SSR approach documented).
+* DiceBear avatar generation integrated and handled asynchronously during profile creation.
 
-## Getting Started
+### Infrastructure & Devops
 
-1. **Clone the Repository:**
+* Dockerfile for containerized builds and simple deployment.
+* Environment-driven configuration (separate dev/prod flow).
+* Centralized error handling and request validation.
 
-   ```bash
-   git clone https://github.com/dev-raghvendramisra/filog.git
-   cd filog
-   ```
+---
 
-Install Dependencies:
+## 🧱 Repo Layout (high-level)
+
+```
+Filog/
+├── Backend/                 # Backend source (primary showcase)
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   └── utils/           # OG generator, avatar helpers, email, etc.
+│   ├── Dockerfile
+│   ├── package.json
+│   └── tsconfig.json
+├── Frontend/                # Demo React UI (marked experimental in this README)
+└── README.md
+```
+
+> Note: The Frontend is a demo UI (React, GSAP animations mentioned). The backend is the production-quality portion of this project and is the primary focus.
+
+---
+
+## 🔍 API Summary
+
+| Method | Endpoint                  | Description              | Auth |
+| ------ | ------------------------- | ------------------------ | ---- |
+| POST   | `/api/auth/register`      | Register user            | ❌    |
+| POST   | `/api/auth/login`         | Login and receive JWT    | ❌    |
+| GET    | `/api/users/:id`          | Get user profile         | ✅    |
+| POST   | `/api/posts`              | Create post              | ✅    |
+| GET    | `/api/posts/:id`          | View post                | ❌    |
+| PATCH  | `/api/posts/:id`          | Edit post (owner only)   | ✅    |
+| DELETE | `/api/posts/:id`          | Delete post (owner only) | ✅    |
+| POST   | `/api/posts/:id/comments` | Add comment              | ✅    |
+| POST   | `/api/posts/:id/like`     | Like / unlike            | ✅    |
+| POST   | `/api/users/:id/follow`   | Follow / unfollow        | ✅    |
+
+*(Add precise request/response schemas or link an OpenAPI/Swagger file if you add one.)*
+
+---
+
+## ⚡ Quick Local Setup
+
+1. Clone & install
 
 ```bash
+git clone https://github.com/dev-raghvendra/Filog.git
+cd Filog/Backend
 npm install
 ```
 
-Environment Setup: Configure your .env file with the necessary backend credentials :
+2. Create `.env` (example)
 
-```bash
-VITE_BACKEND_URL=your_backend_url
-VITE_JWT_SECRET=your_jwt_secret
+```
+MONGO_URI=<your_mongo_uri>
+JWT_SECRET=<your_jwt_secret>
+GOOGLE_CLIENT_ID=<id>
+GOOGLE_CLIENT_SECRET=<secret>
+PORT=4000
 ```
 
-Start the Development Server:
+3. Run in development
 
 ```bash
 npm run dev
+# or
+npm run build
+npm start
 ```
 
-# Filog Project Structure and Key Functions
+Server defaults to `http://localhost:4000` (update PORT in .env as needed).
 
-## Project Structure
+### Docker (optional)
 
-Filog’s project structure is organized into cohesive modules:
+```bash
+docker build -t filog-backend .
+docker run --env-file .env -p 4000:4000 filog-backend
+```
 
-* **Redux Slices**: Includes `auth`, `alert`, `blog`, `form`, `users`, `userPosts`, `search`, etc slices for state management.
-* **Configuration Directory**: The `conf` directory holds configuration settings, managed through the `conf.js` file.
-* **Services**: Organized into classes and modularized for reusability, such as authentication and interaction services.
+---
 
-## Tech used
+## 🧪 Quick API Examples
 
-![auto](https://skillicons.dev/icons?i=react,redux,tailwind,mongodb,docker,express,nodejs,typescript)
+```bash
+# Register
+curl -X POST http://localhost:4000/api/auth/register \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Raghvendra","email":"user@example.com","password":"P@ssw0rd"}'
 
-## Challenges and Solutions
+# Login (returns JWT)
+curl -X POST http://localhost:4000/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"user@example.com","password":"P@ssw0rd"}'
 
-### 1. Issue: Managing User Access and Action Authorization
+# Create post (replace <JWT>)
+curl -X POST http://localhost:4000/api/posts \
+  -H "Authorization: Bearer <JWT>" \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"Hello","content":"This is Filog backend."}'
+```
 
-* **Problem**: Giving users direct access to document updates could lead to unauthorized modifications or expose sensitive data.
-* **Solution**: Introduced an intermediate authorization layer in the backend that verifies user permissions and securely handles actions like following, liking, and commenting.
+---
 
-### 2. Issue: Securing Follow/Unfollow, Like/Unlike Actions
+## 🧠 Design Decisions (why this is backend-first)
 
-* **Problem**: Actions like follow/unfollow and like/unlike require secure handling to prevent unauthorized actions.
-* **Solution**: Used structured API routes with JWT-based authorization and strict backend checks to validate and process interactions securely, ensuring data integrity.
+* **Stateless JWT** for horizontal scaling and simpler session handling.
+* **MongoDB atomic operations** to maintain consistent follower/like counts under concurrency.
+* **OG generation server-side** to provide reliable social previews (documented use of Vercel functions).
+* **Async avatar creation** (DiceBear) to keep user flows snappy.
+* **Dockerized** for CI/CD-friendly deployment.
 
-### 3. Issue: Reducing Loading Time by Managing Avatar Creation
+---
 
-* **Problem**: Generating unique avatars for users initially slowed down profile creation.
-* **Solution**: Integrated **DiceBear API** directly into the profile setup, generating avatars asynchronously based on user ID. This minimized delay in the setup process and ensured every user had a unique avatar without requiring extensive processing time.
+## ✅ What I implemented (from repo)
 
-### 4. Issue: Handling Simultaneous Follow Actions
+* Custom Node.js + TypeScript backend (core logic implemented).
+* Google OAuth & JWT authentication flows.
+* DiceBear avatar integration.
+* Server-side Open Graph generation (Vercel functions / SSR approach referenced).
+* Frontend demo implemented with React + GSAP (kept as demo; not the focus).
 
-* **Problem**: When multiple users attempt to follow the same profile at once, it can cause update conflicts.
-* **Solution**: We implemented optimistic updates on the frontend and conflict resolution logic on the backend using atomic update operations in MongoDB. This ensures accurate and consistent user relationship data without risking duplication or data loss.
+---
 
-### Why This is Useful
+## 📦 Suggested repo additions (quick wins)
 
-By migrating from BaaS to a fully custom backend, we gained greater control over authentication, data integrity, and scalability. This structure gives Filog the flexibility to evolve, support advanced use cases, and deliver a consistent, secure experience even under high user interaction.
+1. Add `Backend/README.md` (this file) and move original README content into `Frontend/README.md` or `README-OLD.md`.
+2. Add an `openapi.json` (small skeleton) and link it from this README.
+3. Export a Postman collection and link it for reviewers to try the API.
+4. Add a short 60–90s demo GIF showing `curl` → post creation → DB entry.
+5. Mark Frontend as **Experimental / Demo** at the top to guide reviewers.
+
+---
+
+## 🗾 Future improvements (roadmap)
+
+* Add Jest + Supertest integration tests for auth and post flows.
+* Redis caching for hot resources and rate-limiting.
+* Notifications via WebSocket / real-time updates.
+* CI GitHub Action which lints, runs tests and builds Docker image.
+
+---
+
+## 👨‍💻 About the author
+
+**Raghvendra Misra** — I built Filog’s backend from scratch to control auth, data integrity, and link previews. This repo showcases backend design, authentication flows, and production-minded patterns.
+
+Repository: [https://github.com/dev-raghvendra/Filog](https://github.com/dev-raghvendra/Filog)
+
+---
+
+🌟 If you find this project useful or interesting, give it a star — it helps me showcase my backend work!
