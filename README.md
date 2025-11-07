@@ -1,7 +1,8 @@
 # 🧠 Filog — Backend Showcase
 
 **Type:** Backend Engineering Project
-**Tech Stack:** Node.js 7 TypeScript 7 Express 7 MongoDB 7 Mongoose 7 JWT Auth 7 Google OAuth 7 Docker
+**Tech Stack:**
+![auto](https://skillicons.dev/icons?i=react,redux,tailwind,mongodb,docker,express,nodejs,typescript)
 
 ---
 
